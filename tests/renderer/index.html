@@ -1,0 +1,30 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Renderer Tests</title>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body style="margin:0; padding:0; overflow:hidden;">
+
+	<script type="text/javascript" src="../../lib/gl-matrix-min.js"></script>
+	<script src="../../src/Craft.js"></script>
+	<script src="../../src/engine/renderer/Renderer.js"></script>
+	<script src="../../src/engine/renderer/Camera.js"></script>
+	<script type="text/javascript">
+		var renderer = new Craft.Renderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+		var camera = new Craft.Camera({
+			aspectRatio: renderer.aspectRatio
+		});
+	</script>
+</body>
+</html>

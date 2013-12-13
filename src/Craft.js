@@ -67,4 +67,7 @@ Craft.extend = function ( obj, source ) {
 
         }
 
+        if( self.assignDefault === undefined)
+                self.assignDefault = function (value, default) { return value !== undefined ? value : default; }
+
 }() );

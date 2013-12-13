@@ -1,5 +1,0 @@
-Craft.Cube = function () {
-
-	
-	
-};
