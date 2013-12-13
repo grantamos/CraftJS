@@ -45,7 +45,6 @@ Craft.Chunk = (function () {
 						var block = _blocks[i][j][z];
 						
 						if(block !== undefined && block.isActive()) {
-
 							addCube(x, y, z);
 						}
 
