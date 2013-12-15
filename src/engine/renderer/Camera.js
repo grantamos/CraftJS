@@ -1,28 +1,43 @@
 Craft.Camera = (function(){
 
-	var Camera = function(params) {
+    /**
+     * Camera
+     *
+     * @name Camera
+     * @function
+     * @param {float} fieldOfView Camera fov
+     * @param {float} aspectRatio Camera's aspect ratio
+     * @param {float} nearVal Dist to near clip plane
+     * @param {float} farVal Dist to far clip plane
+     * @return
+     */
+    function Camera(fieldOfView, aspectRatio, nearVal, farVal) {
 
-		params = params || {};
+        Craft.Object3D.call(this);
+        
+        this.projectionMat = mat4.create();
 
-		var _pMatrix = mat4.create(),
-		_vMatrix = mat4.create(),
-		_fovy = params.fovy !== undefined ? params.fovy : 45,
-		_aspectRatio = params.aspectRatio !== undefined ? params.aspectRatio : window.width/window.height,
-		_near = params.near !== undefined ? params.near : .1,
-		_far = params.far !== undefined ? params.far : 1000;
+        mat4.perspective(this.projectionMat, fieldOfView, aspectRatio, nearVal, farVal);
 
-		mat4.perspective(_pMatrix, _fovy, _aspectRatio, _near, _far);
+        this.look = vec3.create();
 
-		this.getViewMatrix = function() {
-			return _vMatrix;
-		};
+        this.position = vec3.fromValues(0, 0, 0);
+    }
 
-		this.getPerspectiveMatrix = function() {
-			return _pMatrix;
-		};
+    Camera.prototype = new Craft.Object3D();
 
-	};
+    /**
+     * lookAt
+     *
+     * @name lookAt
+     * @function
+     * @param {vec3} target Target vector to look at
+     * @return
+     */
+    Camera.prototype.lookAt = function(target) {
+        this.position = target;
+    };
 
-	return Camera;
+    return Camera;
 
 })();

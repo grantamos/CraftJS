@@ -1,35 +1,63 @@
 Craft.Object3D = (function () {
 
-	var Object3D = function(params){
+    /**
+     * Object3D
+     *
+     * @name Object3D
+     * @function
+     * @return
+     */
+    function Object3D(){
+        this.UID = "";
 
-		params = params !== undefined ? params : {};
+        this.children = [];
 
-		var _tMatrix = mat4.create(),
-		_material = params.material != undefined ? params.material : new Craft.Material(),
-		_objects = [];
+        this.parent = null;
 
-		this.getRenderList = function() {
-			return _objects;
-		}
+        this.matrix = mat4.create();
 
-		this.addMesh = function(mesh) {
-			return _objects.push(mesh);
-		};
+        this.position = vec3.fromValues(0, 0, 0);
 
-		this.getMaterial = function() {
-			return _material;
-		};
+        this.rotation = vec3.create();
 
-		this.getProgram = function() {
-		
-			if(_material != undefined)
-				return _material.getProgram();
-			else
-				return null;
+        this.scale = 1.0;
 
-		};
+        this.up = vec3.fromValues(0, 1, 0);
 
-	};
+        this.look = vec3.fromValues(0, 0, 0);
+	}
+
+    /**
+     * add
+     *
+     * @name add
+     * @function
+     * @param {Object3D} The obj to be added 
+     * @return 
+     */
+    Object3D.prototype.add = function(obj) {
+    };
+
+    /**
+     * remove
+     *
+     * @name remove
+     * @function
+     * @param {Object3D} obj The object to be removed
+     * @return
+     */
+    Object3D.prototype.remove = function(obj) {
+    };
+
+    /**
+     * update
+     *
+     * @name update Updates objects matrix
+     * @function
+     * @return
+     */
+    Object3D.prototype.update = function() {
+    };
 
 	return Object3D;
 
