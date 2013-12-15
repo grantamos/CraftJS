@@ -40,57 +40,30 @@ Craft.Scene = (function() {
 
 		};
 
-		/*
-		this.render = function(renderer) {
+		this.getRenderList = function() {
+		
+			if(!_needsUpdate)
+				return _renderList;
+
+			_renderList = [];
 
 			for(var key in _batches) {
+
+				if(key == -1)
+					continue;
 
 				var batch = _batches[key];
 				var material = batch.material;
 
-				if(material == undefined)
-					continue;
-
-				var success = renderer.setMaterial(material);
-
-				if(!success) {
-					console.log("Material is not ready.");
-					continue;
-				}
-
-				for(var i = 0; i < batch.objects.length; i++) {
-
-					batch.objects[i].render(renderer._gl);
-					
-				}
+				_renderList = _renderList.concat(batch.objects);
 
 			}
-			
-		};
-		*/
 
-	};
+			_needsUpdate = false;
 
-	Scene.prototype.getRenderList = function() {
-		
-		if(!_needsUpdate)
 			return _renderList;
 
-		_renderList = [];
-
-		for(var key in _batches) {
-
-			var batch = _batches[key];
-			var material = batch.material;
-
-			if(material == undefined)
-				continue;
-
-			_renderList.concat(batch.objects);
-
-		}
-
-		return _renderList;
+		};
 
 	};
 

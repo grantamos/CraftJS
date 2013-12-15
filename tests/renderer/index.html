@@ -17,6 +17,8 @@
 	<script type="text/javascript" src="../../lib/gl-matrix-min.js"></script>
 	<script src="../../src/Craft.js"></script>
 	<script src="../../src/engine/renderer/Renderer.js"></script>
+	<script src="../../src/engine/renderer/Shader.js"></script>
+	<script src="../../src/engine/renderer/Mesh.js"></script>
 	<script src="../../src/engine/renderer/Scene.js"></script>
 	<script src="../../src/engine/renderer/Material.js"></script>
 	<script src="../../src/engine/renderer/Object3D.js"></script>
@@ -35,47 +37,55 @@
 
 		var mat = new Craft.Material({
 			vertex: 'plain.vs',
-			fragment: 'plain.fs'
+			fragment: 'plain.fs',
+			attributes: {
+				'aVertexPosition': {
+					type: 'ARRAY_BUFFER'
+				}
+			}
 		});
 
 		var cube = new Craft.Object3D({
-			material: mat,
+			material: mat
+		});
+
+		cube.addMesh(new Craft.Mesh({
 			vertices: [
 				// Front face
-				-1.0, -1.0,  1.0,
-				1.0, -1.0,  1.0,
-				1.0,  1.0,  1.0,
-				-1.0,  1.0,  1.0,
+				-.75, -.75,  .75,
+				.75, -.75,  .75,
+				.75,  .75,  .75,
+				-.75,  .75,  .75,
 
 				// Back face
-				-1.0, -1.0, -1.0,
-				-1.0,  1.0, -1.0,
-				1.0,  1.0, -1.0,
-				1.0, -1.0, -1.0,
+				-.75, -.75, -.75,
+				-.75,  .75, -.75,
+				.75,  .75, -.75,
+				.75, -.75, -.75,
 
 				// Top face
-				-1.0,  1.0, -1.0,
-				-1.0,  1.0,  1.0,
-				1.0,  1.0,  1.0,
-				1.0,  1.0, -1.0,
+				-.75,  .75, -.75,
+				-.75,  .75,  .75,
+				.75,  .75,  .75,
+				.75,  .75, -.75,
 
 				// Bottom face
-				-1.0, -1.0, -1.0,
-				1.0, -1.0, -1.0,
-				1.0, -1.0,  1.0,
-				-1.0, -1.0,  1.0,
+				-.75, -.75, -.75,
+				.75, -.75, -.75,
+				.75, -.75,  .75,
+				-.75, -.75,  .75,
 
 				// Right face
-				1.0, -1.0, -1.0,
-				1.0,  1.0, -1.0,
-				1.0,  1.0,  1.0,
-				1.0, -1.0,  1.0,
+				.75, -.75, -.75,
+				.75,  .75, -.75,
+				.75,  .75,  .75,
+				.75, -.75,  .75,
 
 				// Left face
-				-1.0, -1.0, -1.0,
-				-1.0, -1.0,  1.0,
-				-1.0,  1.0,  1.0,
-				-1.0,  1.0, -1.0,
+				-.75, -.75, -.75,
+				-.75, -.75,  .75,
+				-.75,  .75,  .75,
+				-.75,  .75, -.75,
 			],
 			vertexIndices: [
 				0, 1, 2,      0, 2, 3,    // Front face
@@ -85,7 +95,7 @@
 				16, 17, 18,   16, 18, 19, // Right face
 				20, 21, 22,   20, 22, 23  // Left face
 			]
-		});
+		}));
 
 		scene.add(cube);
 
@@ -93,7 +103,7 @@
 			renderer.render(scene, camera);
 		}
 
-		setInterval(render, 500);
+		setInterval(render, 1000);
 
 	</script>
 </body>

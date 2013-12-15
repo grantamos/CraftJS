@@ -1,27 +1,35 @@
-Craft.VoxelScene = (function () {
-	
-	var VoxelScene = function (params) {
+Craft.VoxelScene = (function() {
 
-		params = assignDefault(params, {});
+	var VoxelScene = function(params) {
 
-		var _numChunks = assignDefault(params.numChunks, 1024);
-		_chunkSize = assignDefault(params.chunkSize, 16),
-		_blockSize = assignDefault(params.blockSize, 1),
-		_chunks = [];
+		params = params !== undefined ? params : {};
 
-		init();
+		Craft.Scene.call(this, params);
+
+		var _numChunks = assignDefault(params.numChunks, 100),
+		_this = this;
 
 		var init = function() {
 
 			for(var i = 0; i < _numChunks; i++) {
 
-				_chunks.push(new Craft.Chunk({
-					size : _chunkSize
+				_this.add(new Craft.Chunk({
+					material: new Craft.Material({
+						vertex: 'plain.vs',
+						fragment: 'plain.fs',
+						attributes: {
+							'aVertexPosition': {
+								type: 'ARRAY_BUFFER'
+							}
+						}
+					})
 				}));
 
 			}
 
-		}
+		};
+
+		init();
 
 	};
 

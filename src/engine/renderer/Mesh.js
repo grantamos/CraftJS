@@ -4,19 +4,35 @@ Craft.Mesh = (function () {
 
 		params = params !== undefined ? params : {};
 
-		var _vertices = assignDefault(params.vertices, []),
-		_vertexIndices = assignDefault(params.vertices, []),
-		_vertexBuffer,
-		_vertexIndexBuffer;
+		this.bindings = {
+			uniforms: {},
+			attributes: {
+				'aVertexPosition': {
+					type: 'ARRAY_BUFFER',
+					value: params.vertices,
+					itemSize: 3,
+					isDirty: false
+				},
+				'aIndexBuffer': {
+					type: 'ELEMENT_ARRAY_BUFFER',
+					value: params.vertexIndices,
+					isInt: true,
+					isDirty: false
+				}
+			},
+			textureSamplers: {}
+		};
 
-	};
+		this.numItems = params.vertexIndices.length;
 
-	Mesh.prototype.render = function(renderer) {
+		if(params.attributes != undefined) {
 
-		renderer.drawMesh(this);
+			for(var key in params.attributes)
+				this.bindings.attributes[key] = params.attributes[key];
+		}
 
 	};
 
 	return Mesh;
 
-});
+})();

@@ -15,12 +15,14 @@ Craft.Camera = (function(){
 
 		this.getViewMatrix = function() {
 			return _vMatrix;
-		}
+		};
 
 		this.getPerspectiveMatrix = function() {
 			return _pMatrix;
-		}
+		};
 
 	};
+
+	return Camera;
 
 })();

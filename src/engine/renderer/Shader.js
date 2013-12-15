@@ -9,8 +9,6 @@ Craft.Shader = (function () {
 		_type = params.type,
 		_shader;
 
-		fetchContent();
-
 		var fetchContent = function() {
 		
 			var xmlhttp = Craft.getXMLHTTP();
@@ -42,6 +40,10 @@ Craft.Shader = (function () {
 		
 		};
 
+		this.getShader = function() {
+			return _shader;
+		}
+
 		this.setShader = function (shader) {
 			
 			_shader = shader;
@@ -55,11 +57,13 @@ Craft.Shader = (function () {
 		};
 
 		this.isInitialized = function() {
-			return hasContent() && _shader != undefined;
+			return this.hasContent() && _shader != undefined;
 		};
+
+		fetchContent();
 
 	};
 
 	return Shader;
 
-});
+})();

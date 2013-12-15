@@ -1,0 +1,66 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Renderer Tests</title>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body style="margin:0; padding:0; overflow:hidden;">
+
+	<script type="text/javascript" src="../../lib/Math.uuid.js"></script>
+	<script type="text/javascript" src="../../lib/stats.min.js"></script>
+	<script type="text/javascript" src="../../lib/gl-matrix-min.js"></script>
+	<script src="../../src/Craft.js"></script>
+	<script src="../../src/engine/renderer/Renderer.js"></script>
+	<script src="../../src/engine/renderer/Shader.js"></script>
+	<script src="../../src/engine/renderer/Mesh.js"></script>
+	<script src="../../src/engine/renderer/Scene.js"></script>
+	<script src="../../src/engine/renderer/Material.js"></script>
+	<script src="../../src/engine/renderer/Object3D.js"></script>
+	<script src="../../src/engine/renderer/Camera.js"></script>
+	<script src="../../src/engine/voxel/Block.js"></script>
+	<script src="../../src/engine/voxel/Chunk.js"></script>
+	<script src="../../src/engine/voxel/VoxelScene.js"></script>
+	<script type="text/javascript">
+
+		var renderer = new Craft.Renderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+		var camera = new Craft.Camera({
+			aspectRatio: renderer.aspectRatio
+		});
+
+		var scene = new Craft.VoxelScene({
+			numChunks: 1
+		});
+
+		function render() {
+			stats.begin();
+			renderer.render(scene, camera);
+			stats.end();
+
+			requestAnimationFrame(render);
+		}
+
+		var stats = new Stats();
+		stats.setMode(0); // 0: fps, 1: ms
+
+		// Align top-left
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild( stats.domElement );
+
+		render();
+
+	</script>
+</body>
+</html>

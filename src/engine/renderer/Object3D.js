@@ -4,53 +4,30 @@ Craft.Object3D = (function () {
 
 		params = params !== undefined ? params : {};
 
-		this._tMatrix = mat4.create(),
-		this._material = params.material != undefined ? params.material : new Craft.Material();
+		var _tMatrix = mat4.create(),
+		_material = params.material != undefined ? params.material : new Craft.Material(),
+		_objects = [];
 
-	};
-
-	Object3D.prototype.render = function(gl) {
-
-		if(_vertexBuffer == undefined) {
-
-			_vertexBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, _vertexBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_vertices), gl.STATIC_DRAW);
-
-			_vertexBuffer.itemSize = 3;
-			_vertexBuffer.numItems = _vertices.length / 3;
-
+		this.getRenderList = function() {
+			return _objects;
 		}
 
-		if(_vertexIndexBuffer == undefined) {
+		this.addMesh = function(mesh) {
+			return _objects.push(mesh);
+		};
 
-			_vertexIndexBuffer = gl.createBuffer();
+		this.getMaterial = function() {
+			return _material;
+		};
 
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _vertexIndexBuffer);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
-			_vertexIndexBuffer.itemSize = 1;
-			_vertexIndexBuffer.numItems = indices.length;
-
-		}
-
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _vertexIndexBuffer);
-		gl.drawElements(gl.TRIANGLES, _vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-
-	};
-
-	Object3D.prototype.getMaterial = function() {
+		this.getProgram = function() {
 		
-		return this._material;
+			if(_material != undefined)
+				return _material.getProgram();
+			else
+				return null;
 
-	};
-
-	Object3D.prototype.getProgram = function() {
-		
-		if(this._material !== undefined)
-			return this._material.getProgram();
-		else
-			return null;
+		};
 
 	};
 
