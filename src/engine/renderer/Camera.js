@@ -19,24 +19,9 @@ Craft.Camera = (function(){
 
         mat4.perspective(this.projectionMat, fieldOfView, aspectRatio, nearVal, farVal);
 
-        this.look = vec3.create();
-
-        this.position = vec3.fromValues(0, 0, 0);
     }
 
     Camera.prototype = new Craft.Object3D();
-
-    /**
-     * lookAt
-     *
-     * @name lookAt
-     * @function
-     * @param {vec3} target Target vector to look at
-     * @return
-     */
-    Camera.prototype.lookAt = function(target) {
-        this.position = target;
-    };
 
     return Camera;
 

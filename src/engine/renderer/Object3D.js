@@ -24,7 +24,7 @@ Craft.Object3D = (function () {
 
         this.up = vec3.fromValues(0, 1, 0);
 
-        this.look = vec3.fromValues(0, 0, 0);
+        this.lookAt = vec3.fromValues(0, 0, 0);
 	}
 
     /**
@@ -47,6 +47,7 @@ Craft.Object3D = (function () {
      * @return
      */
     Object3D.prototype.remove = function(obj) {
+        
     };
 
     /**
@@ -57,7 +58,12 @@ Craft.Object3D = (function () {
      * @return
      */
     Object3D.prototype.update = function() {
+
     };
+
+	Object3D.prototype.look = function(vec) {
+	    this.lookAt = vec;
+	};
 
 	return Object3D;
 
