@@ -1,0 +1,187 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>CraftJS</title>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
+  <link href='styles.css' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+	<canvas id="header"></canvas>
+	<canvas id="subheader"></canvas>
+
+	<script>
+		var header = document.getElementById("header");
+		header.width = window.innerWidth;
+		header.height = window.innerHeight / 2;
+
+		var subheader = document.getElementById("subheader");
+		subheader.width = window.innerWidth;
+		subheader.height = window.innerHeight / 2;
+		
+		var highlightColor = "#60B9CE";
+		var fillColor = "#333333";
+
+		var done = 0;
+
+		var doneDrawing = function() {
+			done++;
+
+			if(done == 2) {
+				enableDrawing();
+			}
+		};
+
+		var getPos = function(e) {
+			e = e || window.event;
+			var docEl = document.documentElement;
+			var scrollLeft = docEl.scrollLeft || document.body.scrollLeft;
+			var scrollTop  = docEl.scrollLeft || document.body.scrollLeft;
+			var x = e.pageX || (e.clientX  + scrollLeft);
+			var y = e.pageY || (e.clientY  + scrollTop);
+
+			return {'x': x, 'y': y};
+		};
+
+		var enableDrawing = function() {
+			document.body.onmousemove = function(e) {
+				var coords = getPos(e);
+				if(coords.y < window.innerHeight / 2) {
+					drawOutline(header, coords, 0);
+				} else {
+					drawOutline(subheader, coords, window.innerHeight/2);
+				}
+			};
+		};
+
+		var drawOutline = function(canvas, coords, offset) {
+
+			var context = canvas.getContext("2d");
+			var pixelWidth = canvas.pixelWidth;
+
+			context.strokeStyle = highlightColor;
+			context.lineWidth = 1;
+
+			context.strokeRect(Math.floor(coords.x / pixelWidth) * pixelWidth, Math.floor(coords.y / pixelWidth) * pixelWidth - offset, pixelWidth, pixelWidth);
+
+		};
+
+		var drawSquare = function() {
+
+		};
+
+		var getTextContext = function(text, size) {
+			var characters = text.split('');
+			var out = [];
+
+			for(var item in characters) {
+				var letter = characters[item];
+
+				var textCanvas = document.createElement("canvas");
+				
+				var width = size * .6;
+				var height = size;
+				
+				textCanvas.width = width;
+				textCanvas.height = height;
+
+				var context = textCanvas.getContext("2d");
+
+				context.fillStyle = "#000000"
+				context.textBaseline = "middle";
+				context.textAlign = "center";
+				context.font = size + "px Lucida Console";
+				context.fillText(letter, width/2, height/2);
+
+				out.push(textCanvas);
+			}
+
+			return out;
+		};
+
+		var drawText = function(destCanvas, text, size, highlightColor, fillColor) {
+
+			var destContext = destCanvas.getContext("2d");
+
+			destContext.fillStyle = fillColor;
+			destContext.strokeStyle = highlightColor;
+			destContext.lineWidth = 1;
+
+			var letters = getTextContext(text, size);
+
+			var numLetters = text.length;
+			var letterSize = size * .6;
+			var textWidth = letterSize * numLetters;
+			var scale = destCanvas.width / textWidth;
+
+			destCanvas.pixelWidth = scale;
+
+			for(var i = 0; i < letters.length; i++){
+
+				drawLetter(letters[i], destCanvas, i * letterSize * scale, scale);
+
+			};
+		};
+
+		var drawLetter = function(sourceCanvas, destCanvas, offset, pixelWidth, highlightColor, fillColor) {
+
+			var destContext = destCanvas.getContext("2d");
+
+			var w = sourceCanvas.width;
+			var h = sourceCanvas.height;
+
+			var x = 0;
+			var y = h - 1;
+
+			var imageData = sourceCanvas.getContext("2d").getImageData(0, 0, w, h);
+			var data = imageData.data;
+
+			var renderBlue = true;
+
+			var intervalId = setInterval(function(){
+
+				var currentVal = data[(x * 4 + 3) + (y * w * 4)];
+
+				if(currentVal > 100) {
+
+					if(renderBlue)
+						destContext.strokeRect(offset + x * pixelWidth, y * pixelWidth, pixelWidth, pixelWidth);
+					else
+						destContext.fillRect(offset + x * pixelWidth, y * pixelWidth, pixelWidth, pixelWidth);
+
+					renderBlue = !renderBlue;
+				}
+
+				if(!renderBlue && currentVal > 0)
+					return;
+
+				do {
+					x++;
+
+					if(x == w && y == 0) {
+						clearInterval(intervalId);
+						doneDrawing();
+					} else if(x == w){
+						x = 0;
+						y--;
+					}
+				} while(data[(x * 4 + 3) + (y * w * 4)] == 0);
+
+			}, 50);
+		};
+
+		drawText(header, "CraftJS", 16, highlightColor, fillColor);
+		drawText(subheader, "Coming Soon", 16, highlightColor, fillColor);
+		//drawText("Coming Soon", 20);
+		//document.body.appendChild(getTextContext("Hello there this is a really long test ia really long test ia really long test it should work", 30));
+	</script>
+</body>
+</html>
