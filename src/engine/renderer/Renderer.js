@@ -12,13 +12,13 @@ Craft.Renderer = (function() {
 		_material,
 		_program,
 		_renderBackFaces = false,
-		_mvMatrix = mat4.identity(mat4.create()),
+		_mvMatrix = mat4.create(),
 		_pMatrix,
 		_mvMatrixStack = [];
 
 		var mvPushMatrix = function() {
 		    var copy = mat4.create();
-		    mat4.set(_mvMatrix, copy);
+		    mat4.copy(copy, _mvMatrix);
 		    _mvMatrixStack.push(copy);
 		};
 
@@ -27,6 +27,13 @@ Craft.Renderer = (function() {
 		      return;
 		    }
 		    _mvMatrix = _mvMatrixStack.pop();
+		};
+
+		var multiplyMvMatrix = function(matrix) {
+
+			mvPushMatrix(_mvMatrix);
+			_mvMatrix = mat4.multiply(_mvMatrix, _mvMatrix, matrix);
+
 		};
 
 		var initGL = function() {
@@ -64,29 +71,32 @@ Craft.Renderer = (function() {
 
 		};
 
-		var createProgram = function(fragmentSource, vertexSource) {
+		var createShader = function(shaderSource, shaderType) {
 
-			if(fragmentSource == undefined || vertexSource == undefined)
+			if(shaderSource == undefined)
 				return null;
 
-			var fragmentShader = _gl.createShader(_gl.FRAGMENT_SHADER);
-			var vertexShader = _gl.createShader(_gl.VERTEX_SHADER);
+			var shader = _gl.createShader(shaderType);
 
-			_gl.shaderSource(fragmentShader, fragmentSource);
-			_gl.compileShader(fragmentShader);
+			_gl.shaderSource(shader, shaderSource);
+			_gl.compileShader(shader);
 
-			if (!_gl.getShaderParameter(fragmentShader, _gl.COMPILE_STATUS)) {
-				alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(fragmentShader));
-				return null;
-			}
-
-			_gl.shaderSource(vertexShader, vertexSource);
-			_gl.compileShader(vertexShader);
-
-			if (!_gl.getShaderParameter(fragmentShader, _gl.COMPILE_STATUS)) {
-				alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(vertexShader));
+			if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
+				alert("An error occurred compiling the shaders: " + _gl.getShaderInfoLog(shader));
 				return null;
 			}
+
+			return shader;
+
+		};
+
+		var createProgram = function(fragmentSource, vertexSource, bindings) {
+
+			var fragmentShader = createShader(fragmentSource, _gl.FRAGMENT_SHADER);
+			var vertexShader = createShader(vertexSource, _gl.VERTEX_SHADER);
+
+			if(fragmentShader == undefined || vertexShader == undefined)
+				return null;
 
 			var program = _gl.createProgram();
 
@@ -100,30 +110,28 @@ Craft.Renderer = (function() {
 				return null;
 			}
 
+			initBindings(program, bindings);
+
 			return program;
 
 		};
 
 		var setMaterial = function(material) {
 
-			if(material == undefined)
-				return false;
+			if(_material != undefined && material.id == _material.id)
+				return;
 
-			if(_material != undefined && material.getId() == _material.getId())
-				return true;
-
-			var program = material.getProgram();
+			var program = material.program;
 			var bindings = material.bindings;
 
 			if(program == undefined) {
 				
-				program = createProgram(material.getFragmentSource(), material.getVertexSource());
+				program = createProgram(material.fragmentSource, material.vertexSource, bindings);
 				
 				if(program == undefined)
 					return false;
 
-				material.setProgram(program);
-				getBindingLocations(program);
+				material.program = program;
 			}
 
 			_material = material;
@@ -131,32 +139,56 @@ Craft.Renderer = (function() {
 
 			_gl.useProgram(_program);
 
-			if(_pMatrix != undefined && _program.uniforms.pMatrix != undefined) {
-				_gl.uniformMatrix4fv(_program.uniforms.pMatrix.location, false, _pMatrix);
-			}
-
 			bind(bindings);
 
 			return true;
 		};
 
-		var getBindingLocations = function(program) {
+		var initBindings = function(program, bindings) {
 
-			for(var key in program.uniforms) {
-				program.uniforms[key].location = _gl.getUniformLocation(program, key);
+			for(var key in bindings.uniforms) {
+
+				var uniform = bindings.uniforms[key];
+
+				var glType = 'uniform';
+
+				switch(uniform.type) {
+					case "mat":
+						glType += 'Matrix' + uniform.size + "fv";
+						break;
+					case "int":
+						glType += uniform.size + 'iv';
+						break;
+					case "float":
+						glType += uniform.size + 'fv';
+						break;
+				}
+
+				uniform.glType = glType;
+
+				uniform.location = _gl.getUniformLocation(program, key);
 			};
 
-			for(var key in program.attributes) {
-				program.attributes[key].location = _gl.getAttribLocation(program, key);
+			for(var key in bindings.attributes) {
+
+				var attribute = bindings.attributes[key];
+
+				if(attribute.type == 'array')
+					attribute.glType = 'vertexAttrib'+attribute.size+''+attribute.type[0]+'v';
+
+				attribute.location = _gl.getAttribLocation(program, key);
 			};
 
-			for(var key in program.textureSamplers) {
-				program.textureSamplers[key].location = _gl.getUniformLocation(program, key);
+			for(var key in bindings.textureSamplers) {
+				bindings.textureSamplers[key].location = _gl.getUniformLocation(program, key);
 			};
 
 		};
 
 		var bind = function(bindings) {
+
+			if(_material == undefined || _program == undefined)
+				return;
 
 			if(bindings.uniforms != undefined)
 				bindUniforms(bindings.uniforms);
@@ -173,25 +205,25 @@ Craft.Renderer = (function() {
 
 			for(var key in uniforms) {
 
-				var programUniform = _program.uniforms[key];
+				if(_material.bindings.uniforms[key] == undefined)
+					continue;
 
-				if(programUniform != undefined)
-					bindUniform(uniforms[key], programUniform);
+				bindUniform(key, uniforms[key]);
 			}
 
 		};
 
-		var bindUniform = function(uniform, programUniform) {
+		var bindUniform = function(uniformKey, uniform) {
 
-			if(uniform.value == undefined || uniform.value == programUniform.value)
+			if(uniform.value == undefined || uniform.value == _material.bindings.uniforms[key].value)
 				return;
 
 			if(uniform.type == 'mat')
-				gl[uniform.evalType](programUniform.location, false, uniform.value);
+				gl[uniform.glType](uniform.location, false, uniform.value);
 			else
-				gl[uniform.evalType](programUniform.location, uniform.value);
+				gl[uniform.glType](uniform.location, uniform.value);
 
-			currentUniform.value = uniform.value;
+			_material.bindings.uniforms[key].value = uniform.value;
 
 		};
 
@@ -199,26 +231,26 @@ Craft.Renderer = (function() {
 
 			for(var key in attributes) {
 
-				var programAttribute = _program.attributes[key];
+				if(_material.bindings.attributes[key] == undefined)
+					continue;
 
-				if(programAttribute != undefined)
-					bindAttribute(attributes[key], programAttribute);
+				bindAttribute(key, attributes[key]);
 			}
 
 		};
 
-		var bindAttribute = function(attribute, programAttribute) {
+		var bindAttribute = function(key, attribute) {
 
-			if(attribute.value == undefined || programAttribute.value == attribute.value)
+			if(attribute.value == undefined || attribute.value == _material.bindings.attributes[key].value)
 				return;
 
 			if(attribute.type == 'array') {
 
-				_gl[attribute.evalType](programAttribute.location, attribute.value);
+				_gl[attribute.glType](attribute.location, attribute.value);
 
 			} else {
 
-				if(attribute.buffer == undefined || attribute.isDirty) {
+				if(attribute.buffer == undefined) {
 					attribute.buffer = bufferData(
 						null,
 						_gl[attribute.type],
@@ -231,13 +263,13 @@ Craft.Renderer = (function() {
 				_gl.bindBuffer(_gl[attribute.type], attribute.buffer);
 
 				if(attribute.type != "ELEMENT_ARRAY_BUFFER") {
-			    	_gl.vertexAttribPointer(programAttribute.location, attribute.itemSize, _gl.FLOAT, false, 0, 0);
-			    	_gl.enableVertexAttribArray(programAttribute.location);
+			    	_gl.vertexAttribPointer(attribute.location, attribute.itemSize, _gl.FLOAT, false, 0, 0);
+			    	_gl.enableVertexAttribArray(attribute.location);
 			    }
 
 			}
 
-			programAttribute.value = attribute.value;
+			_material.bindings.attributes[key].value = attribute.value;
 
 		};
 
@@ -246,21 +278,19 @@ Craft.Renderer = (function() {
 			var i = 0;
 
 			for(var key in textureSamplers) {
-				
-				var programSampler = _program.textureSamplers[key];
 
-				if(programSampler != undefined) {
+				if(_material.bindings.textureSamplers[key] == undefined)
+					continue;
 					
-					bindTextureSampler(textureSampler, i, programSampler);
-					i++;
-				}
+				bindTextureSampler(key, textureSamplers[key], i);
+				i++;
 			}
 
 		};
 
-		var bindTextureSampler = function(textureSampler, index, programSampler) {
+		var bindTextureSampler = function(key, textureSampler, index) {
 
-			if(textureSampler.value == undefined || textureSampler.value == programSampler.value)
+			if(textureSampler.value == undefined || textureSampler.value == _material.bindings.textureSamplers[key].value)
 				return;
 
 			var textureType = gl.TEXTURE_2D;
@@ -270,65 +300,72 @@ Craft.Renderer = (function() {
 
 			gl.activeTexture(gl['TEXTURE'+index]);
 			gl.bindTexture(textureType, textureSampler.value);
-			gl.uniform1i(programSampler.location, index);
+			gl.uniform1i(textureSampler.location, index);
+
+			_material.bindings.textureSamplers[key].value = textureSamplers.value;
 
 		};
 
-		var bindObject = function(renderable) {
+		var bindObject = function(item) {
 
-			if(renderable.bindings == undefined || _program == undefined)
+			if(item.bindings == undefined || _program == undefined)
 				return;
 
-			bind(renderable.bindings);
+			bind(item.bindings);
 
 		};
 
-		var renderObject = function(renderable) {
+		var renderObject = function(item) {
 
-			if(!(renderable instanceof Craft.Mesh))
+			if(!(item instanceof Craft.Mesh))
 				return;
 
 			if(_renderBackFaces)
 				_gl.disable(gl.CULL_FACE);
 
-			_gl.drawElements(_gl.TRIANGLES, renderable.numItems, _gl.UNSIGNED_SHORT, 0);
+			var pMatrixBinding = _material.bindings.uniforms.uPMatrix;
+			if(_pMatrix != undefined && pMatrixBinding != undefined) {
+				_gl.uniformMatrix4fv(pMatrixBinding.location, false, _pMatrix);
+			}
+
+			var mvMatrixBinding = _material.bindings.uniforms.uMVMatrix;
+			if(_mvMatrix != undefined && mvMatrixBinding != undefined) {
+				_gl.uniformMatrix4fv(mvMatrixBinding.location, false, _mvMatrix);
+			}
+
+			_gl.drawElements(_gl.TRIANGLES, item.numItems, _gl.UNSIGNED_SHORT, 0);
 
 			if(_renderBackFaces)
 				_gl.enable(_gl.CULL_FACE);
 
 		};
 
-		var renderNode = function(node) {
+		var renderObjects = function(objects) {
 
-			if(node.getRenderList == undefined) {
+			if(objects == undefined)
 				return;
-			}
 
-			var list = node.getRenderList();
+			for(var i = 0; i < objects.length; i++) {
 
-			for(var i = 0; i < list.length; i++) {
-
-				var childeNode = list[i];
-				var material;
+				var child = objects[i];
+				var material = child.material;
 				
-				if(childeNode.getMaterial != undefined) {
-					material = childeNode.getMaterial();
+				if(material != undefined) {
 					setMaterial(material);
 				}
 
-				if(childeNode.getModelMatrix != undefined) {
-					mvPushMatrix();
-					mat4.multiply(_mvMatrix, childeNode.getModelMatrix(), _mvMatrix);
+				if(child.matrix != undefined) {
+					multiplyMvMatrix(child.matrix);
 				}
 
 				if(_material != undefined) {
-					bindObject(childeNode);
-					renderObject(childeNode);
+					bindObject(child);
+					renderObject(child);
 				}
 
-				renderNode(childeNode);
+				renderObjects(child.children);
 
-				if(childeNode.getModelMatrix != undefined)
+				if(child.matrix != undefined)
 					mvPopMatrix();
 
 			}
@@ -339,10 +376,15 @@ Craft.Renderer = (function() {
 
 			_gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-			mvPushMatrix(camera.getViewMatrix());
-			_pMatrix = camera.getPerspectiveMatrix();
+			_pMatrix = camera.projectionMat;
 
-			renderNode(scene);
+			multiplyMvMatrix(camera.matrix);
+			multiplyMvMatrix(scene.matrix);
+
+			renderObjects(scene.getRenderList());
+
+			mvPopMatrix();
+			mvPopMatrix();
 
 			_pMatrix = null;
 		
