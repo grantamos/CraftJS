@@ -12,7 +12,7 @@ Craft.Chunk = (function () {
 		_mesh,
 		_vertices = [],
 		_vertexIndices = [],
-		_meshList = [];
+		_this = this;
 
 		var createChunk = function () {
 			_blocks = new Array();
@@ -50,11 +50,11 @@ Craft.Chunk = (function () {
 						if(block !== undefined && block.isActive()) {
 							var xPos, xNeg, yPos, yNeg, zPos, zNeg;
 
-							xPos = x == _size - 1 || _blocks[x+1][y][z].isActive();
-							xNeg = x == 0 || _blocks[x-1][y][z].isActive();
-							yPos = y == _size - 1 || _blocks[x][y+1][z].isActive();
-							yNeg = y == 0 || _blocks[x][y-1][z].isActive();
-							zPos = z == _size - 1 || _blocks[x][y][z+1].isActive();
+							xPos = x == _size - 1 || !_blocks[x+1][y][z].isActive();
+							xNeg = x == 0 || !_blocks[x-1][y][z].isActive();
+							yPos = y == _size - 1 || !_blocks[x][y+1][z].isActive();
+							yNeg = y == 0 || !_blocks[x][y-1][z].isActive();
+							zPos = z == _size - 1 || !_blocks[x][y][z+1].isActive();
 							zNeg = z == 0 || !_blocks[x][y][z-1].isActive();
 
 							addCube(
@@ -76,14 +76,14 @@ Craft.Chunk = (function () {
 				vertexIndices: _vertexIndices
 			});
 
-			_meshList.push(_mesh);
+			_this.add(_mesh);
 
 		};
 
 		var addCube = function(x, y, z, xNeg, xPos, yNeg, yPos, zNeg, zPos) {
 
 			var startLength = _vertices.length;
-			var offset = _vertices.length + 1;
+			var offset = _vertices.length / 3;
 
 			if(zPos) {
 				_vertices.push(
@@ -195,14 +195,12 @@ Craft.Chunk = (function () {
 
 		}
 
-		this.getRenderList = function() {
-			return _meshList;
-		};
-
 		createChunk();
 		buildMesh();
 
 	};
+
+	Chunk.prototype = new Craft.Object3D();
 
 	return Chunk;
 

@@ -21,7 +21,7 @@ Craft.Camera = (function(){
         fieldOfView = fieldOfView != undefined ? fieldOfView : 45;
         aspectRatio = aspectRatio !== undefined ? aspectRatio : window.innerWidth/window.innerHeight;
         nearVal = nearVal !== undefined ? nearVal : .1;
-        farVal = farVal !== undefined ? farVal : 1000;
+        farVal = farVal !== undefined ? farVal : 10000;
 
         mat4.perspective(this.projectionMat, fieldOfView, aspectRatio, nearVal, farVal);
 

@@ -208,22 +208,24 @@ Craft.Renderer = (function() {
 				if(_material.bindings.uniforms[key] == undefined)
 					continue;
 
-				bindUniform(key, uniforms[key]);
+				bindUniform(key, uniforms[key].value);
 			}
 
 		};
 
-		var bindUniform = function(uniformKey, uniform) {
+		var bindUniform = function(key, value) {
 
-			if(uniform.value == undefined || uniform.value == _material.bindings.uniforms[key].value)
+			var uniform = _material.bindings.uniforms[key];
+
+			if(value == undefined || value == uniform.value)
 				return;
 
 			if(uniform.type == 'mat')
-				gl[uniform.glType](uniform.location, false, uniform.value);
+				_gl[uniform.glType](uniform.location, false, value);
 			else
-				gl[uniform.glType](uniform.location, uniform.value);
+				_gl[uniform.glType](uniform.location, value);
 
-			_material.bindings.uniforms[key].value = uniform.value;
+			uniform.value = value;
 
 		};
 
@@ -241,12 +243,14 @@ Craft.Renderer = (function() {
 
 		var bindAttribute = function(key, attribute) {
 
-			if(attribute.value == undefined || attribute.value == _material.bindings.attributes[key].value)
+			var materialAttribute = _material.bindings.attributes[key];
+
+			if(attribute.value == undefined || attribute.value == materialAttribute.value)
 				return;
 
 			if(attribute.type == 'array') {
 
-				_gl[attribute.glType](attribute.location, attribute.value);
+				_gl[attribute.glType](materialAttribute.location, attribute.value);
 
 			} else {
 
@@ -263,13 +267,13 @@ Craft.Renderer = (function() {
 				_gl.bindBuffer(_gl[attribute.type], attribute.buffer);
 
 				if(attribute.type != "ELEMENT_ARRAY_BUFFER") {
-			    	_gl.vertexAttribPointer(attribute.location, attribute.itemSize, _gl.FLOAT, false, 0, 0);
-			    	_gl.enableVertexAttribArray(attribute.location);
+			    	_gl.vertexAttribPointer(materialAttribute.location, attribute.itemSize, _gl.FLOAT, false, 0, 0);
+			    	_gl.enableVertexAttribArray(materialAttribute.location);
 			    }
 
 			}
 
-			_material.bindings.attributes[key].value = attribute.value;
+			materialAttribute.value = attribute.value;
 
 		};
 
@@ -293,14 +297,14 @@ Craft.Renderer = (function() {
 			if(textureSampler.value == undefined || textureSampler.value == _material.bindings.textureSamplers[key].value)
 				return;
 
-			var textureType = gl.TEXTURE_2D;
+			var textureType = _gl.TEXTURE_2D;
 
 			if(textureSampler.type == 'cube')
-				textureType = gl.TEXTURE_CUBE_MAP;
+				textureType = _gl.TEXTURE_CUBE_MAP;
 
-			gl.activeTexture(gl['TEXTURE'+index]);
-			gl.bindTexture(textureType, textureSampler.value);
-			gl.uniform1i(textureSampler.location, index);
+			_gl.activeTexture(_gl['TEXTURE'+index]);
+			_gl.bindTexture(textureType, textureSampler.value);
+			_gl.uniform1i(textureSampler.location, index);
 
 			_material.bindings.textureSamplers[key].value = textureSamplers.value;
 
@@ -323,7 +327,12 @@ Craft.Renderer = (function() {
 			if(_renderBackFaces)
 				_gl.disable(gl.CULL_FACE);
 
-			var pMatrixBinding = _material.bindings.uniforms.uPMatrix;
+			//var pMatrixBinding = _material.bindings.uniforms.uPMatrix;
+
+			bindUniform('uPMatrix', _pMatrix);
+			bindUniform('uMVMatrix', _mvMatrix);
+
+			/*
 			if(_pMatrix != undefined && pMatrixBinding != undefined) {
 				_gl.uniformMatrix4fv(pMatrixBinding.location, false, _pMatrix);
 			}
@@ -332,6 +341,7 @@ Craft.Renderer = (function() {
 			if(_mvMatrix != undefined && mvMatrixBinding != undefined) {
 				_gl.uniformMatrix4fv(mvMatrixBinding.location, false, _mvMatrix);
 			}
+			*/
 
 			_gl.drawElements(_gl.TRIANGLES, item.numItems, _gl.UNSIGNED_SHORT, 0);
 

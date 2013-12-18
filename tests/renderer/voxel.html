@@ -18,12 +18,12 @@
 	<script type="text/javascript" src="../../lib/gl-matrix-min.js"></script>
 	<script src="../../src/Craft.js"></script>
 	<script src="../../src/engine/renderer/Renderer.js"></script>
-	<script src="../../src/engine/renderer/Shader.js"></script>
+	<script src="../../src/engine/renderer/Object3D.js"></script>
 	<script src="../../src/engine/renderer/Mesh.js"></script>
 	<script src="../../src/engine/renderer/Scene.js"></script>
 	<script src="../../src/engine/renderer/Material.js"></script>
-	<script src="../../src/engine/renderer/Object3D.js"></script>
 	<script src="../../src/engine/renderer/Camera.js"></script>
+	<script src="../../src/engine/materials/BasicMaterial.js"></script>
 	<script src="../../src/engine/voxel/Block.js"></script>
 	<script src="../../src/engine/voxel/Chunk.js"></script>
 	<script src="../../src/engine/voxel/VoxelScene.js"></script>
@@ -33,18 +33,25 @@
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.body.appendChild(renderer.domElement);
 
-		var camera = new Craft.Camera({
-			aspectRatio: renderer.aspectRatio
-		});
+		var camera = new Craft.Camera();
 
 		var scene = new Craft.VoxelScene({
-			numChunks: 1
+			numChunks: 5
 		});
+
+		var delta = 0;
+		var lastCalledTime = new Date().getTime();
 
 		function render() {
 			stats.begin();
+
+			camera.translate(0,0,-10 * delta);
+
 			renderer.render(scene, camera);
-			stats.end();
+			
+			var callTime = stats.end();
+			delta = (callTime - lastCalledTime)/1000;
+			lastCalledTime = callTime;
 
 			requestAnimationFrame(render);
 		}

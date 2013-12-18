@@ -11,19 +11,15 @@ Craft.VoxelScene = (function() {
 
 		var init = function() {
 
+			var mat = new Craft.BasicMaterial();
+
 			for(var i = 0; i < _numChunks; i++) {
 
-				_this.add(new Craft.Chunk({
-					material: new Craft.Material({
-						vertex: 'plain.vs',
-						fragment: 'plain.fs',
-						attributes: {
-							'aVertexPosition': {
-								type: 'ARRAY_BUFFER'
-							}
-						}
-					})
-				}));
+				var chunk = new Craft.Chunk({
+					material: mat
+				});
+
+				_this.add(chunk);
 
 			}
 
@@ -32,6 +28,8 @@ Craft.VoxelScene = (function() {
 		init();
 
 	};
+
+	VoxelScene.prototype = new Craft.Scene();
 
 	return VoxelScene;
 
