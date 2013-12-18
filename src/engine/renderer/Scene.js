@@ -2,68 +2,60 @@ Craft.Scene = (function() {
 
 	var Scene = function(params) {
 
+		Craft.Object3D.call(this);
+
 		params = params !== undefined ? params : {};
 
-		_batches = { '-1': {
-			material : null,
-			objects : []
-		}},
-		_renderList = [],
-		_needsUpdate = false;
+		this.batches = { '-1': []};
+		this.renderList = [];
+		this.needsUpdate = false;
 
-		this.add = function(object) {
+	};
 
-			_needsUpdate = true;
+	Scene.prototype = new Craft.Object3D();
 
-			var mat = object.getMaterial();
+	Scene.prototype.add = function(obj) {
 
-			if(mat == undefined) {
+		this.needsUpdate = true;
 
-				_batches['-1'].objects.push(object);
+		var mat = obj.material;
 
-				return;
+		if(mat == undefined) {
 
-			}
+			this.batches['-1'].push(obj);
 
-			var id = mat.getId();
+			return;
 
-			if(_batches[id] == undefined) {
+		}
 
-				_batches[id] = {
-					material : mat,
-					objects : []
-				};
+		var id = mat.id;
 
-			}
+		if(this.batches[id] == undefined) {
 
-			_batches[id].objects.push(object);
+			this.batches[id] = [];
 
-		};
+		}
 
-		this.getRenderList = function() {
+		this.batches[id].push(obj);
+
+	};
+
+	Scene.prototype.getRenderList = function() {
 		
-			if(!_needsUpdate)
-				return _renderList;
+		if(!this.needsUpdate)
+			return this.renderList;
 
-			_renderList = [];
+		this.renderList = [];
 
-			for(var key in _batches) {
+		for(var key in this.batches) {
 
-				if(key == -1)
-					continue;
+			this.renderList = this.renderList.concat(this.batches[key]);
 
-				var batch = _batches[key];
-				var material = batch.material;
+		}
 
-				_renderList = _renderList.concat(batch.objects);
+		this.needsUpdate = false;
 
-			}
-
-			_needsUpdate = false;
-
-			return _renderList;
-
-		};
+		return this.renderList;
 
 	};
 

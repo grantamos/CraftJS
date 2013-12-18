@@ -14,14 +14,15 @@
 <body style="margin:0; padding:0; overflow:hidden;">
 
 	<script type="text/javascript" src="../../lib/Math.uuid.js"></script>
+	<script type="text/javascript" src="../../lib/stats.min.js"></script>
 	<script type="text/javascript" src="../../lib/gl-matrix-min.js"></script>
 	<script src="../../src/Craft.js"></script>
 	<script src="../../src/engine/renderer/Renderer.js"></script>
-	<script src="../../src/engine/renderer/Shader.js"></script>
+	<script src="../../src/engine/renderer/Object3D.js"></script>
 	<script src="../../src/engine/renderer/Mesh.js"></script>
 	<script src="../../src/engine/renderer/Scene.js"></script>
 	<script src="../../src/engine/renderer/Material.js"></script>
-	<script src="../../src/engine/renderer/Object3D.js"></script>
+	<script src="../../src/engine/materials/BasicMaterial.js"></script>
 	<script src="../../src/engine/renderer/Camera.js"></script>
 	<script type="text/javascript">
 
@@ -29,27 +30,69 @@
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.body.appendChild(renderer.domElement);
 
-		var camera = new Craft.Camera({
-			aspectRatio: renderer.aspectRatio
-		});
+		var camera = new Craft.Camera();
 
 		var scene = new Craft.Scene();
 
-		var mat = new Craft.Material({
-			vertex: 'plain.vs',
-			fragment: 'plain.fs',
-			attributes: {
-				'aVertexPosition': {
-					type: 'ARRAY_BUFFER'
-				}
-			}
-		});
+		var mat = new Craft.BasicMaterial();
 
 		var cube = new Craft.Object3D({
 			material: mat
 		});
 
-		cube.addMesh(new Craft.Mesh({
+		cube.add(new Craft.Mesh({
+			vertices: [
+				// Front face
+				-.75, -.75,  .75,
+				.75, -.75,  .75,
+				.75,  .75,  .75,
+				-.75,  .75,  .75,
+
+				// Back face
+				-.75, -.75, -.75,
+				-.75,  .75, -.75,
+				.75,  .75, -.75,
+				.75, -.75, -.75,
+
+				// Top face
+				-.75,  .75, -.75,
+				-.75,  .75,  .75,
+				.75,  .75,  .75,
+				.75,  .75, -.75,
+
+				// Bottom face
+				-.75, -.75, -.75,
+				.75, -.75, -.75,
+				.75, -.75,  .75,
+				-.75, -.75,  .75,
+
+				// Right face
+				.75, -.75, -.75,
+				.75,  .75, -.75,
+				.75,  .75,  .75,
+				.75, -.75,  .75,
+
+				// Left face
+				-.75, -.75, -.75,
+				-.75, -.75,  .75,
+				-.75,  .75,  .75,
+				-.75,  .75, -.75,
+			],
+			vertexIndices: [
+				0, 1, 2,      0, 2, 3,    // Front face
+				4, 5, 6,      4, 6, 7,    // Back face
+				8, 9, 10,     8, 10, 11,  // Top face
+				12, 13, 14,   12, 14, 15, // Bottom face
+				16, 17, 18,   16, 18, 19, // Right face
+				20, 21, 22,   20, 22, 23  // Left face
+			]
+		}));
+
+		var cube2 = new Craft.Object3D({
+			material: mat
+		});
+
+		cube2.add(new Craft.Mesh({
 			vertices: [
 				// Front face
 				-.75, -.75,  .75,
@@ -98,12 +141,49 @@
 		}));
 
 		scene.add(cube);
+		scene.add(cube2);
+
+		cube.translate(1,0,0);
+		cube2.translate(0,1,0);
+
+		camera.translate(0, 0, -5);
+
+		var delta = 0;
+		var lastCalledTime = new Date().getTime();
+
+		var stats = new Stats();
+		stats.setMode(0); // 0: fps, 1: ms
+
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild( stats.domElement );
 
 		var render = function () {
+			stats.begin();
+
+			//cube.translate(0,0,-.2 * delta);
+			//cube.rotateX(0.0872664626 * delta);
+			//cube.rotateY(0.174532925 * delta);
+
+			//cube2.translate(-.04 * delta, .06 * delta,-.1 * delta);
+			//cube2.rotateX(0.5 * delta);
+			//cube2.rotateY(0.1 * delta);
+
+			//camera.rotateX(.05 * delta);
+			camera.translate(.1 * delta, 0, 0);
+
 			renderer.render(scene, camera);
+
+			var callTime = stats.end();
+			delta = (callTime - lastCalledTime)/1000;
+			lastCalledTime = callTime;
+
+			requestAnimationFrame(render);
 		}
 
-		setInterval(render, 1000);
+		render();
 
 	</script>
 </body>

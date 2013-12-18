@@ -7,8 +7,13 @@ Craft.Object3D = (function () {
      * @function
      * @return
      */
-    function Object3D(){
+    function Object3D(params){
+
+        params = params != undefined ? params : {};
+
         this.UID = "";
+
+        this.material = params.material;
 
         this.children = [];
 
@@ -36,6 +41,10 @@ Craft.Object3D = (function () {
      * @return 
      */
     Object3D.prototype.add = function(obj) {
+
+        this.children.push(obj);
+        obj.parent = this;
+
     };
 
     /**
@@ -48,6 +57,14 @@ Craft.Object3D = (function () {
      */
     Object3D.prototype.remove = function(obj) {
         
+        var index = this.children.indexOf(obj);
+
+        if(index != -1) {
+
+            this.children = this.children.splice(index, 1);
+            obj.parent = null; 
+        }
+
     };
 
     /**
@@ -64,6 +81,22 @@ Craft.Object3D = (function () {
 	Object3D.prototype.look = function(vec) {
 	    this.lookAt = vec;
 	};
+
+    Object3D.prototype.rotateX = function(x) {
+        mat4.rotateX(this.matrix, this.matrix, x);
+    };
+
+    Object3D.prototype.rotateY = function(y) {
+        mat4.rotateY(this.matrix, this.matrix, y);
+    };
+
+    Object3D.prototype.rotateZ = function(z) {
+        mat4.rotateZ(this.matrix, this.matrix, z);
+    };
+
+    Object3D.prototype.translate = function(x, y, z) {
+        mat4.translate(this.matrix, this.matrix, vec3.fromValues(x, y, z));
+    };
 
 	return Object3D;
 

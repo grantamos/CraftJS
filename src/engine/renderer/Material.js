@@ -4,11 +4,12 @@ Craft.Material = (function () {
 
 		params = params !== undefined ? params : {};
 
-		var _id = Math.uuid(),		
-		_fragmentSource,
-		_vertexSource,
-		_program,
-		_this = this;
+		var _this = this;
+
+		this.id = Math.uuid();
+		this.fragmentSource;
+		this.vertexSource;
+		this.program;
 
 		this.bindings = {
 			uniforms: assignDefault(params.uniforms, {}),
@@ -19,16 +20,12 @@ Craft.Material = (function () {
 		var init = function() {
 
 			fetchContent(params.fragment, function(content){
-				_fragmentSource = content;
+				_this.fragmentSource = content;
 			});
 
 			fetchContent(params.vertex, function(content){
-				_vertexSource = content;
+				_this.vertexSource = content;
 			});
-
-			_this.bindings.attributes.aIndexBuffer = {};
-		
-			_this.updateBindings();
 		};
 
 		var fetchContent = function(url, callback) {
@@ -50,47 +47,7 @@ Craft.Material = (function () {
 
 		};
 
-		this.updateBindings = function() {
-
-			for(var key in this.bindings.uniforms) {
-
-				var uniform = this.bindings.uniforms[key];
-
-				var evalType = 'uniform';
-				var isMat = uniform.type == 'mat';
-
-				evalType += isMat ? 'Matrix' : '';
-
-				evalType += uniform.size;
-				evalType += (isMat ? 'f' : uniform.type[0]) + 'v';
-
-				uniform.evalType = evalType;
-			
-			}
-
-			for(var key in this.bindings.attributes) {
-
-				var attribute = this.bindings.attributes[key];
-
-				if(attribute.type == 'array')
-					attribute.evalType = 'vertexAttrib'+attribute.size+''+attribute.type[0]+'v';
-
-			}
-
-		};
-
-		this.getFragmentSource = function() {
-			return _fragmentSource;
-		};
-
-		this.getVertexSource = function() {
-			return _vertexSource;
-		};
-
-		this.getProgram = function() {
-			return _program;
-		}
-
+		/*
 		this.setProgram = function(program) {
 			
 			_program = program;
@@ -111,16 +68,7 @@ Craft.Material = (function () {
 			for(var key in this.bindings.textureSamplers)
 				_program.textureSamplers[key] = {value: undefined};
 		};
-
-		this.needsBuild = function() {
-			return _program == undefined;
-		};
-
-		this.getId = function() {
-
-			return _id;
-
-		};
+		*/
 
 		init();
 
