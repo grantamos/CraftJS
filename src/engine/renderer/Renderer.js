@@ -13,6 +13,7 @@ Craft.Renderer = (function() {
 		_program,
 		_renderBackFaces = false,
 		_mvMatrix = mat4.create(),
+		_nMatrix = mat4.create(),
 		_pMatrix,
 		_mvMatrixStack = [];
 
@@ -43,8 +44,8 @@ Craft.Renderer = (function() {
 				_gl = _canvas.getContext('webgl') || _canvas.getContext('experimental-webgl');
 
 				_gl.clearColor(0.0, 0.0, 0.0, 1.0);                      // Set clear color to black, fully opaque
-			    _gl.enable(gl.DEPTH_TEST);                               // Enable depth testing
-			    _gl.depthFunc(gl.LEQUAL);                                // Near things obscure far things
+			    _gl.enable(_gl.DEPTH_TEST);                               // Enable depth testing
+			    _gl.depthFunc(_gl.LEQUAL);                                // Near things obscure far things
 			} catch(e) {
 				error = e;
 			}
@@ -332,6 +333,11 @@ Craft.Renderer = (function() {
 			bindUniform('uPMatrix', _pMatrix);
 			bindUniform('uMVMatrix', _mvMatrix);
 
+			mat4.invert(_nMatrix, _mvMatrix);
+			mat4.transpose(_nMatrix, _nMatrix);
+
+			bindUniform('uNMatrix', _nMatrix);
+
 			/*
 			if(_pMatrix != undefined && pMatrixBinding != undefined) {
 				_gl.uniformMatrix4fv(pMatrixBinding.location, false, _pMatrix);
@@ -350,7 +356,7 @@ Craft.Renderer = (function() {
 
 		};
 
-		var renderObjects = function(objects) {
+		var renderObjects = function(objects, camera) {
 
 			if(objects == undefined)
 				return;
@@ -373,7 +379,8 @@ Craft.Renderer = (function() {
 					renderObject(child);
 				}
 
-				renderObjects(child.children);
+				if(child.getRenderList != undefined)
+					renderObjects(child.getRenderList(camera));
 
 				if(child.matrix != undefined)
 					mvPopMatrix();
@@ -391,7 +398,7 @@ Craft.Renderer = (function() {
 			multiplyMvMatrix(camera.matrix);
 			multiplyMvMatrix(scene.matrix);
 
-			renderObjects(scene.getRenderList());
+			renderObjects(scene.getRenderList(), camera);
 
 			mvPopMatrix();
 			mvPopMatrix();

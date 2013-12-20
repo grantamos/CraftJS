@@ -19,7 +19,7 @@ Craft.Object3D = (function () {
 
         this.parent = null;
 
-        this.matrix = mat4.create();
+        this.matrix = assignDefault(params.matrix, mat4.create());
 
         this.position = vec3.fromValues(0, 0, 0);
 
@@ -30,6 +30,8 @@ Craft.Object3D = (function () {
         this.up = vec3.fromValues(0, 1, 0);
 
         this.lookAt = vec3.fromValues(0, 0, 0);
+
+        this.bounds = new Craft.Bounds(vec3.create(), vec3.create());
 	}
 
     /**
@@ -44,6 +46,9 @@ Craft.Object3D = (function () {
 
         this.children.push(obj);
         obj.parent = this;
+
+        if(obj.bounds != undefined)
+            this.bounds.encapsulate(obj.bounds);
 
     };
 
@@ -96,6 +101,10 @@ Craft.Object3D = (function () {
 
     Object3D.prototype.translate = function(x, y, z) {
         mat4.translate(this.matrix, this.matrix, vec3.fromValues(x, y, z));
+    };
+
+    Object3D.prototype.getRenderList = function() {
+        return this.children;
     };
 
 	return Object3D;

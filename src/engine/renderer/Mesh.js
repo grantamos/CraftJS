@@ -18,6 +18,12 @@ Craft.Mesh = (function () {
 					value: params.vertexIndices,
 					isInt: true,
 					isDirty: false
+				},
+				'aVertexNormal': {
+					type: 'ARRAY_BUFFER',
+					value: params.normals,
+					itemSize: 3,
+					isDirty: false
 				}
 			},
 			textureSamplers: {}

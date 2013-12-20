@@ -49,6 +49,9 @@ Craft.Scene = (function() {
 
 		for(var key in this.batches) {
 
+			if(key == -1)
+				continue;
+			
 			this.renderList = this.renderList.concat(this.batches[key]);
 
 		}

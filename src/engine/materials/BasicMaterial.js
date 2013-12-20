@@ -11,6 +11,10 @@ Craft.BasicMaterial = (function () {
 				type: 'ARRAY_BUFFER',
 				itemSize: 3
 			},
+			'aVertexNormal': {
+				type: 'ARRAY_BUFFER',
+				itemSize: 3
+			},
 			'aIndexBuffer': {
 				type: 'ELEMENT_ARRAY_BUFFER',
 				isInt: true
@@ -23,6 +27,10 @@ Craft.BasicMaterial = (function () {
 				size: 4
 			},
 			'uMVMatrix': {
+				type: 'mat',
+				size: 4
+			},
+			'uNMatrix': {
 				type: 'mat',
 				size: 4
 			}
