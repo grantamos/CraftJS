@@ -1,0 +1,32 @@
+<html>
+<head>
+	<!--<script src="socket.io-client.js"></script>-->
+	<script src="/socket.io/socket.io.js"></script>
+</head>
+<body onload="open()">
+	<script type="text/javascript">
+	var socket;
+	function open()
+	{
+		socket = io.connect('http://localhost:8080');
+		socket.on('news', function(data)
+		{
+			console.log(data);
+			var header = document.getElementById('header');
+			header.innerHTML = data.hello;
+			//socket.emit('Dat Event', {my: 'data'});
+		});
+	}
+
+	function send()
+	{
+		var message = document.getElementById('message');
+		socket.emit('Dat Event', {my: message.value});
+		message.value = '';
+	}
+    </script>
+    <h1 id="header"></h1>
+    <input type="text" name="message" id="message">
+    <button id="send" onclick="send()">Send</button>
+</body>
+</html>
