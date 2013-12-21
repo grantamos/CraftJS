@@ -1,6 +1,6 @@
-Craft.Terrain = (function() {
+Craft.Terrain3D = (function() {
 
-	var Terrain = function(params) {
+	var Terrain3D = function(params) {
 
 		Craft.Object3D.call(this, params);
 
@@ -81,16 +81,8 @@ Craft.Terrain = (function() {
 
 	};
 
-	Terrain.prototype = new Craft.Object3D();
+	Terrain3D.prototype = new Craft.Object3D();
 
-	/*
-	Terrain.prototype.getRenderList = function(camera) {
-
-		this.update(camera.matrix);
-
-	};
-	*/
-
-	return Terrain;
+	return Terrain3D;
 
 })();

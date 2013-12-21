@@ -17,6 +17,8 @@ Craft.VoxelObject = (function () {
 		var buildMesh = function () {
 
 			var xSize = _blockData.length;
+
+			var empty = true;
 			
 			for (var x = 0; x < _blockData.length; x++) {
 
@@ -30,6 +32,8 @@ Craft.VoxelObject = (function () {
 
 						if(!_blockData[x][y][z])
 							continue;
+
+						empty = false;
 						
 						var xPos, xNeg, yPos, yNeg, zPos, zNeg;
 
@@ -52,6 +56,9 @@ Craft.VoxelObject = (function () {
 				};
 
 			};
+
+			if(empty)
+				return;
 
 			_mesh = new Craft.Mesh({
 				vertices: _vertices,

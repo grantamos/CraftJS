@@ -14,6 +14,7 @@ Craft.Renderer = (function() {
 		_renderBackFaces = false,
 		_mvMatrix = mat4.create(),
 		_nMatrix = mat4.create(),
+		_cMatrix,
 		_pMatrix,
 		_mvMatrixStack = [];
 
@@ -260,7 +261,7 @@ Craft.Renderer = (function() {
 						null,
 						_gl[attribute.type],
 						attribute.value,
-						_gl.DYNAMIC_DRAW,
+						_gl.STATIC_DRAW,
 						attribute.isInt
 					);
 				}
@@ -316,7 +317,9 @@ Craft.Renderer = (function() {
 			if(item.bindings == undefined || _program == undefined)
 				return;
 
+			//console.time("bindObject");
 			bind(item.bindings);
+			//console.timeEnd("bindObject");
 
 		};
 
@@ -325,8 +328,12 @@ Craft.Renderer = (function() {
 			if(!(item instanceof Craft.Mesh))
 				return;
 
+			//console.time("renderObject");
+
 			if(_renderBackFaces)
 				_gl.disable(gl.CULL_FACE);
+
+			multiplyMvMatrix(_cMatrix);
 
 			//var pMatrixBinding = _material.bindings.uniforms.uPMatrix;
 
@@ -351,9 +358,12 @@ Craft.Renderer = (function() {
 
 			_gl.drawElements(_gl.TRIANGLES, item.numItems, _gl.UNSIGNED_SHORT, 0);
 
+			mvPopMatrix();
+
 			if(_renderBackFaces)
 				_gl.enable(_gl.CULL_FACE);
 
+			//console.timeEnd("renderObject");
 		};
 
 		var renderObjects = function(objects, camera) {
@@ -367,11 +377,15 @@ Craft.Renderer = (function() {
 				var material = child.material;
 				
 				if(material != undefined) {
+					//console.time("setMaterial");
 					setMaterial(material);
+					//console.timeEnd("setMaterial");
 				}
 
 				if(child.matrix != undefined) {
+					//console.time("multiplyMvMatrix");
 					multiplyMvMatrix(child.matrix);
+					//console.timeEnd("multiplyMvMatrix");
 				}
 
 				if(_material != undefined) {
@@ -379,8 +393,11 @@ Craft.Renderer = (function() {
 					renderObject(child);
 				}
 
-				if(child.getRenderList != undefined)
+				if(child.getRenderList != undefined) {
+					//console.time("getRenderList");
 					renderObjects(child.getRenderList(camera));
+					//console.timeEnd("getRenderList");
+				}
 
 				if(child.matrix != undefined)
 					mvPopMatrix();
@@ -391,19 +408,25 @@ Craft.Renderer = (function() {
 
 		this.render = function(scene, camera) {
 
+			//console.time("renderScene");
+
 			_gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
 			_pMatrix = camera.projectionMat;
+			_cMatrix = camera.matrix;
 
-			multiplyMvMatrix(camera.matrix);
+			//multiplyMvMatrix(camera.matrix);
 			multiplyMvMatrix(scene.matrix);
 
 			renderObjects(scene.getRenderList(), camera);
 
-			mvPopMatrix();
+			//mvPopMatrix();
 			mvPopMatrix();
 
+			//console.timeEnd("renderScene");
+
 			_pMatrix = null;
+			_cMatrix = null;
 		
 		};
 

@@ -1,0 +1,103 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Renderer Tests</title>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body style="margin:0; padding:0; overflow:hidden;">
+
+	<label><input type="checkbox" name="pauseRendering" onchange="toggleRendering(this);">Pause Rendering</label>
+
+	<script type="text/javascript" src="../../lib/Math.uuid.js"></script>
+	<script type="text/javascript" src="../../lib/stats.min.js"></script>
+	<script type="text/javascript" src="../../lib/gl-matrix-min.js"></script>
+	<script type="text/javascript" src="../../lib/perlin-noise-simplex.js"></script>
+	<!--<script type="text/javascript" src="../../lib/simplex-noise.js"></script>-->
+	<script src="../../src/Craft.js"></script>
+	<script src="../../src/engine/renderer/Renderer.js"></script>
+	<script src="../../src/engine/renderer/Bounds.js"></script>
+	<script src="../../src/engine/renderer/Object3D.js"></script>
+	<script src="../../src/engine/renderer/Mesh.js"></script>
+	<script src="../../src/engine/renderer/Scene.js"></script>
+	<script src="../../src/engine/renderer/Material.js"></script>
+	<script src="../../src/engine/renderer/Camera.js"></script>
+	<script src="../../src/game/FlyCamera.js"></script>
+	<script src="../../src/game/Input.js"></script>
+	<script src="../../src/engine/materials/BasicMaterial.js"></script>
+	<script src="../../src/engine/voxel/VoxelObject.js"></script>
+	<script src="../../src/engine/terrain/Terrain2D.js"></script>
+	<script src="../../src/engine/voxel/Block.js"></script>
+	<script src="../../src/engine/voxel/Chunk.js"></script>
+	<script src="../../src/engine/voxel/VoxelScene.js"></script>
+	<script type="text/javascript">
+
+		var shouldRender = true;
+
+		function toggleRendering(checkbox) {
+			shouldRender = !checkbox.checked;
+		};
+
+		var renderer = new Craft.Renderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+		var input = new Craft.Input({domElement: document});
+
+		var camera = new Craft.FlyCamera({input: input});
+
+		var scene = new Craft.Scene();
+		var terrain = new Craft.Terrain2D({
+			chunkSize: 32,
+			drawDistance: 10,
+			scale: 100
+		});
+
+		scene.add(terrain);
+
+		var delta = 0;
+		var lastCalledTime = new Date().getTime();
+
+		function render() {
+			stats.begin();
+
+			if(shouldRender) {
+				//console.time("render");
+
+				//camera.translate(0,0,-10 * delta);
+
+				camera.update(delta);
+
+				renderer.render(scene, camera);
+
+				//console.timeEnd("render");
+			}
+
+			var callTime = stats.end();
+			delta = (callTime - lastCalledTime)/1000;
+			lastCalledTime = callTime;
+
+			requestAnimationFrame(render);
+		}
+
+		var stats = new Stats();
+		stats.setMode(0); // 0: fps, 1: ms
+
+		// Align top-left
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild( stats.domElement );
+
+		render();
+
+	</script>
+</body>
+</html>

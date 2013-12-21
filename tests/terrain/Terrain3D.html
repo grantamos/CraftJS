@@ -13,6 +13,8 @@
 
 <body style="margin:0; padding:0; overflow:hidden;">
 
+	<label><input type="checkbox" name="pauseRendering" onchange="toggleRendering(this);">Pause Rendering</label>
+
 	<script type="text/javascript" src="../../lib/Math.uuid.js"></script>
 	<script type="text/javascript" src="../../lib/stats.min.js"></script>
 	<script type="text/javascript" src="../../lib/gl-matrix-min.js"></script>
@@ -26,25 +28,36 @@
 	<script src="../../src/engine/renderer/Scene.js"></script>
 	<script src="../../src/engine/renderer/Material.js"></script>
 	<script src="../../src/engine/renderer/Camera.js"></script>
+	<script src="../../src/game/FlyCamera.js"></script>
+	<script src="../../src/game/Input.js"></script>
 	<script src="../../src/engine/materials/BasicMaterial.js"></script>
 	<script src="../../src/engine/voxel/VoxelObject.js"></script>
-	<script src="../../src/engine/terrain/Terrain.js"></script>
+	<script src="../../src/engine/terrain/Terrain3D.js"></script>
 	<script src="../../src/engine/voxel/Block.js"></script>
 	<script src="../../src/engine/voxel/Chunk.js"></script>
 	<script src="../../src/engine/voxel/VoxelScene.js"></script>
 	<script type="text/javascript">
 
+		var shouldRender = true;
+
+		function toggleRendering(checkbox) {
+			shouldRender = !checkbox.checked;
+		};
+
 		var renderer = new Craft.Renderer();
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.body.appendChild(renderer.domElement);
 
-		var camera = new Craft.Camera();
+		var input = new Craft.Input({domElement: document});
+
+		var camera = new Craft.FlyCamera({input: input});
 
 		var scene = new Craft.Scene();
-		var terrain = new Craft.Terrain({
-			drawDistance: 10,
+		var terrain = new Craft.Terrain3D({
+			chunkSize: 32,
+			drawDistance: 5,
 			fillValue: 0,
-			scale: 40
+			scale: 30
 		});
 
 		scene.add(terrain);
@@ -55,10 +68,18 @@
 		function render() {
 			stats.begin();
 
-			camera.translate(0,0,-10 * delta);
+			if(shouldRender) {
+				//console.time("render");
 
-			renderer.render(scene, camera);
-			
+				//camera.translate(0,0,-10 * delta);
+
+				camera.update(delta);
+
+				renderer.render(scene, camera);
+
+				//console.timeEnd("render");
+			}
+
 			var callTime = stats.end();
 			delta = (callTime - lastCalledTime)/1000;
 			lastCalledTime = callTime;
