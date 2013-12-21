@@ -8,29 +8,16 @@ Craft.Object3D = (function () {
      * @return
      */
     function Object3D(params){
-
         params = params != undefined ? params : {};
-
-        this.UID = "";
-
         this.material = params.material;
-
         this.children = [];
-
         this.parent = null;
-
         this.matrix = assignDefault(params.matrix, mat4.create());
-
         this.position = vec3.fromValues(0, 0, 0);
-
         this.rotation = vec3.create();
-
         this.scale = 1.0;
-
         this.up = vec3.fromValues(0, 1, 0);
-
         this.lookAt = vec3.fromValues(0, 0, 0);
-
         this.bounds = new Craft.Bounds(vec3.create(), vec3.create());
 	}
 
@@ -43,13 +30,11 @@ Craft.Object3D = (function () {
      * @return 
      */
     Object3D.prototype.add = function(obj) {
-
         this.children.push(obj);
         obj.parent = this;
 
         if(obj.bounds != undefined)
             this.bounds.encapsulate(obj.bounds);
-
     };
 
     /**
@@ -61,15 +46,12 @@ Craft.Object3D = (function () {
      * @return
      */
     Object3D.prototype.remove = function(obj) {
-        
         var index = this.children.indexOf(obj);
 
         if(index != -1) {
-
             this.children = this.children.splice(index, 1);
             obj.parent = null; 
         }
-
     };
 
     /**
@@ -80,7 +62,6 @@ Craft.Object3D = (function () {
      * @return
      */
     Object3D.prototype.update = function() {
-
     };
 
 	Object3D.prototype.look = function(vec) {

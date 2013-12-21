@@ -29,12 +29,9 @@ Craft.Chunk = (function () {
 
 						_blocks[x][y][z] = new Craft.Block();
 
-					};
-
-				};
-
-			};
-
+					}
+				}
+			}
 		};
 
 		var buildMesh = function () {
@@ -193,7 +190,7 @@ Craft.Chunk = (function () {
 				_vertices[i+2] += z;
 			}
 
-		}
+		};
 
 		createChunk();
 		buildMesh();

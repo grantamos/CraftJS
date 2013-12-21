@@ -23,11 +23,9 @@ Craft.VoxelObject = (function () {
 			for (var x = 0; x < _blockData.length; x++) {
 
 				var ySize = _blockData[x].length;
-
 				for (var y = 0; y < _blockData[x].length; y++) {
 
 					var zSize = _blockData[x][y].length;
-
 					for (var z = 0; z < _blockData[x][y].length; z++) {
 
 						if(!_blockData[x][y][z])
@@ -38,11 +36,11 @@ Craft.VoxelObject = (function () {
 						var xPos, xNeg, yPos, yNeg, zPos, zNeg;
 
 						xPos = x == xSize - 1 || !_blockData[x+1][y][z];
-						xNeg = x == 0 || !_blockData[x-1][y][z];
-						yPos = y == ySize - 1 || !_blockData[x][y+1][z];
-						yNeg = y == 0 || !_blockData[x][y-1][z];
+						xNeg = x === 0 || !_blockData[x-1][y][z];
+						yPos = y === ySize - 1 || !_blockData[x][y+1][z];
+						yNeg = y === 0 || !_blockData[x][y-1][z];
 						zPos = z == zSize - 1 || !_blockData[x][y][z+1];
-						zNeg = z == 0 || !_blockData[x][y][z-1];
+						zNeg = z === 0 || !_blockData[x][y][z-1];
 
 						addCube(
 							x*_blockSize, y*_blockSize, z*_blockSize,
@@ -50,12 +48,9 @@ Craft.VoxelObject = (function () {
 							yNeg, yPos,
 							zNeg, zPos
 						);
-
-					};
-
-				};
-
-			};
+					}
+				}
+			}
 
 			if(empty)
 				return;
@@ -225,10 +220,9 @@ Craft.VoxelObject = (function () {
 				_vertices[i+2] += z;
 			}
 
-		}
+		};
 
 		buildMesh();
-
 	};
 
 	VoxelObject.prototype = new Craft.Object3D();

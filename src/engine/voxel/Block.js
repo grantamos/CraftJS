@@ -8,11 +8,11 @@ Craft.Block = (function () {
 
 		this.setActive = function (active) {
 			_active = active;
-		}
+		};
 
 		this.isActive = function () {
 			return _active;
-		}
+		};
 
 	};
 

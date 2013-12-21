@@ -25,17 +25,15 @@ Craft.Renderer = (function() {
 		};
 
 		var mvPopMatrix = function() {
-		    if (_mvMatrixStack.length == 0) {
+		    if (_mvMatrixStack.length === 0) 
 		      return;
-		    }
+
 		    _mvMatrix = _mvMatrixStack.pop();
 		};
 
 		var multiplyMvMatrix = function(matrix) {
-
 			mvPushMatrix(_mvMatrix);
 			_mvMatrix = mat4.multiply(_mvMatrix, _mvMatrix, matrix);
-
 		};
 
 		var initGL = function() {
@@ -64,7 +62,7 @@ Craft.Renderer = (function() {
 			if(isInt)
 				bufferData = new Uint16Array(bufferData);
 			else
-				bufferData = new Float32Array(bufferData)
+				bufferData = new Float32Array(bufferData);
 
 			_gl.bindBuffer(bufferType, buffer);
 			_gl.bufferData(bufferType, bufferData, drawType);
@@ -121,13 +119,12 @@ Craft.Renderer = (function() {
 		var setMaterial = function(material) {
 
 			if(_material != undefined && material.id == _material.id)
-				return;
+				return false;
 
 			var program = material.program;
 			var bindings = material.bindings;
 
 			if(program == undefined) {
-				
 				program = createProgram(material.fragmentSource, material.vertexSource, bindings);
 				
 				if(program == undefined)
@@ -164,14 +161,16 @@ Craft.Renderer = (function() {
 					case "float":
 						glType += uniform.size + 'fv';
 						break;
+					default:
+                        break;
 				}
 
 				uniform.glType = glType;
 
 				uniform.location = _gl.getUniformLocation(program, key);
-			};
+			}
 
-			for(var key in bindings.attributes) {
+			for(key in bindings.attributes) {
 
 				var attribute = bindings.attributes[key];
 
@@ -179,11 +178,11 @@ Craft.Renderer = (function() {
 					attribute.glType = 'vertexAttrib'+attribute.size+''+attribute.type[0]+'v';
 
 				attribute.location = _gl.getAttribLocation(program, key);
-			};
+			}
 
-			for(var key in bindings.textureSamplers) {
+			for(key in bindings.textureSamplers) {
 				bindings.textureSamplers[key].location = _gl.getUniformLocation(program, key);
-			};
+			}
 
 		};
 
@@ -212,7 +211,6 @@ Craft.Renderer = (function() {
 
 				bindUniform(key, uniforms[key].value);
 			}
-
 		};
 
 		var bindUniform = function(key, value) {

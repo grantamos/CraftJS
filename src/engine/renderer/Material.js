@@ -34,44 +34,16 @@ Craft.Material = (function () {
 
 			xmlhttp.onreadystatechange = function() {
 
-				if (xmlhttp.readyState == 4 && (xmlhttp.status == 200 || xmlhttp.status == 0)) {
-					
+				if (xmlhttp.readyState == 4 && (xmlhttp.status == 200 || xmlhttp.status === 0)) {
 					callback(xmlhttp.responseText);
-				
 				}
-
 			};
 
 			xmlhttp.open("GET", url, true);
 			xmlhttp.send();
-
 		};
-
-		/*
-		this.setProgram = function(program) {
-			
-			_program = program;
-
-			_program.attributes = {};
-			_program.uniforms = {
-				pMatrix: {},
-				mvMatrix: {}
-			};
-			_program.textureSamplers = {};
-
-			for(var key in this.bindings.uniforms)
-				_program.uniforms[key] = {value: undefined};
-
-			for(var key in this.bindings.attributes)
-				_program.attributes[key] = {value: undefined};
-
-			for(var key in this.bindings.textureSamplers)
-				_program.textureSamplers[key] = {value: undefined};
-		};
-		*/
 
 		init();
-
 	};
 
 	return Material;

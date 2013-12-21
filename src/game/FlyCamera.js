@@ -15,11 +15,11 @@ Craft.FlyCamera = (function(){
 
         params = assignDefault(params, {});
 
-        Craft.Camera.call(this, params.fieldOfView, params.aspectRatio, params.nearVal, params.farVal);
+        Craft.Camera.call(this, params.fieldOfView, params.aspectRatio,
+                          params.nearVal, params.farVal);
 
         this.input = params.input;
-        
-    }
+    };
 
     FlyCamera.prototype = new Craft.Camera();
 

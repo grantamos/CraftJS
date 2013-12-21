@@ -37,7 +37,6 @@ Craft.BasicMaterial = (function () {
 		};
 
 		Craft.Material.call(this, params);
-
 	};
 
 	return BasicMaterial;

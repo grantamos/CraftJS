@@ -3,7 +3,6 @@ Craft.Mesh = (function () {
 	var Mesh = function (params) {
 
 		params = params !== undefined ? params : {};
-
 		this.bindings = {
 			uniforms: {},
 			attributes: {
@@ -32,7 +31,6 @@ Craft.Mesh = (function () {
 		this.numItems = params.vertexIndices.length;
 
 		if(params.attributes != undefined) {
-
 			for(var key in params.attributes)
 				this.bindings.attributes[key] = params.attributes[key];
 		}

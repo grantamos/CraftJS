@@ -12,7 +12,6 @@ Craft.VoxelScene = (function() {
 		var init = function() {
 
 			var mat = new Craft.BasicMaterial();
-
 			for(var i = 0; i < _numChunks; i++) {
 
 				var chunk = new Craft.Chunk({
@@ -20,13 +19,10 @@ Craft.VoxelScene = (function() {
 				});
 
 				_this.add(chunk);
-
 			}
-
 		};
 
 		init();
-
 	};
 
 	VoxelScene.prototype = new Craft.Scene();

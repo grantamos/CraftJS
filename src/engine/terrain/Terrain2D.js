@@ -19,15 +19,12 @@ Craft.Terrain2D = (function() {
 		var generateRandomVoxelData = function(x1, y1, z1, size) {
 
 			var data = new Array();
-
 			for (var x = 0; x < size; x++) {
 				
 				data[x] = new Array();
-
 				for (var y = 0; y < size; y++) {
 
 					data[x][y] = new Array();
-
 					for(var z = 0; z < size; z++) {
 
 						var simplexValue = _this.simplexNoise.noise((x1*size + x)/_this.scale, (z1*size + z)/_this.scale);
@@ -35,19 +32,14 @@ Craft.Terrain2D = (function() {
 						simplexValue = simplexValue / 2.0;
 						
 						data[x][y][z] = simplexValue * _this.chunksHigh * size > y1 * size + y;
-
-					};
-
-				};
-
-			};
+					}
+				}
+			}
 
 			return data;
-
 		};
 
 		var loadVoxelTimeout = function(x, y, z, timeout) {
-
 			setTimeout(function() {
 				var voxelData = generateRandomVoxelData(x, y, z, _this.chunkSize);
 
@@ -63,23 +55,16 @@ Craft.Terrain2D = (function() {
 		};
 
 		var init = function() {
-
 			for(var x = 0; x < _this.drawDistance; x++) {
-
 				for(var y = 0; y < _this.chunksHigh; y++) {
-
 					for(var z = 0; z < _this.drawDistance; z++) {
-
 						loadVoxelTimeout(x, y, z, x*100);
-
 					}
 				}
 			}
-
 		};
 
 		init();
-
 	};
 
 	Terrain2D.prototype = new Craft.Object3D();

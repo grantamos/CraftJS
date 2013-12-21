@@ -32,17 +32,11 @@ Craft.Terrain3D = (function() {
 
 						var simplexValue = _this.simplexNoise.noise3d((x1*size + x)/_this.scale, (y1*size + y)/_this.scale, (z1*size + z)/_this.scale);
 						data[x][y][z] = simplexValue > _this.fillValue;
-
-						//console.log(simplexValue + " | " + _this.simplexNoise.noise3d(x1*size + x, y1*size + y, z1*size + z));
-
-					};
-
-				};
-
-			};
+					}
+				}
+			}
 
 			return data;
-
 		};
 
 		var loadVoxelTimeout = function(x, y, z, timeout) {
@@ -64,21 +58,15 @@ Craft.Terrain3D = (function() {
 		var init = function() {
 
 			for(var x = 0; x < _this.drawDistance; x++) {
-
 				for(var y = 0; y < _this.drawDistance; y++) {
-
 					for(var z = 0; z < _this.drawDistance; z++) {
-
 						loadVoxelTimeout(x, y, z, x*100);
-
 					}
 				}
 			}
-
 		};
 
 		init();
-
 	};
 
 	Terrain3D.prototype = new Craft.Object3D();
