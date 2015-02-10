@@ -3,6 +3,8 @@ CraftJS
 
 CraftJS is a Minecraft clone in written in Javascript.
 
+Run ```node server.js``` to the project directory.
+
 ###Architecture
 * CraftJS will be split into three main components
 	1. Engine
