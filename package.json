@@ -1,0 +1,33 @@
+{
+  "name": "CraftJS",
+  "version": "1.0.0",
+  "description": "Originally a Minecraft clone in JS, most likely just going to be a simple voxel engine for funzies.",
+  "main": "server.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grantamos/CraftJS"
+  },
+  "keywords": [
+    "Voxel",
+    "Minecraft"
+  ],
+  "author": "Grant Amos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/grantamos/CraftJS/issues"
+  },
+  "homepage": "https://github.com/grantamos/CraftJS",
+  "dependencies": {
+    "compression": "^1.4.0",
+    "connect": "^3.3.4",
+    "http": "0.0.0",
+    "serve-static": "^1.8.1"
+  }
+}
